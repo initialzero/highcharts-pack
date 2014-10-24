@@ -47,6 +47,7 @@
 // #13 8/28/2014 fix legend font scaling
 //
 // #14 9/22/2014 apply fix for regression from 4.0.3. Fixes extra label when xAxis period only 2 month
+//     updated 10/24/14 fix BZ39773, highcharts commits: 03c6ddf8b067f2dc09930486e7e37620e6647ba3 7094143ac37ef1f7965b377bea49d88e20559ecd
 //
 // #15 9/23/2014 fix #39105 Y labels overlapping, updated 10/2/14 for fix labels positioning JRS-3415
 //
