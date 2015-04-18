@@ -53,6 +53,9 @@
 //
 // #16 9/25/2014 fix #38113 rotated Y axis labels hide
 //
+// #17 4/18/2015 fix JRS-5582 Click does not work for some charts
+//      fix applied from https://github.com/highslide-software/highcharts.com/commit/4df541623c2ecbd36658f299e10b7e879e506046
+//
 ///////////////////////////////////////////////////////////////////////
 
 //JASPERSOFT #1
@@ -9218,7 +9221,8 @@
 
             // Separate tooltip and general mouse events
             followPointer = hoverSeries && hoverSeries.tooltipOptions.followPointer;
-            if (hoverSeries && hoverSeries.tracker && !followPointer) { // #2584, #2830
+            //JASPERSOFT #17
+            if (hoverSeries && hoverSeries.tracker) { // #2584, #2830
 
                 // get the point
                 point = hoverSeries.tooltipPoints[index];
@@ -9231,10 +9235,12 @@
 
                 }
 
-            } else if (tooltip && followPointer && !tooltip.isHidden) {
+            }
+            if (tooltip && followPointer && !tooltip.isHidden) {
                 anchor = tooltip.getAnchor([{}], e);
                 tooltip.updatePosition({ plotX: anchor[0], plotY: anchor[1] });
             }
+            //JASPERSOFT #17
 
             // Start the event listener to pick up the tooltip 
             if (tooltip && !pointer._onDocumentMouseMove) {
