@@ -15,6 +15,9 @@
     //
     // #3 8/21/2014 JRS-2886 Change strokeWidth to stroke-width attribute
     // for support new HC version
+    //
+    // #4 7/30/2015 JRS-6439 apply fix for https://github.com/blacklabel/grouped_categories/issues/46
+    // Apply formatter for 1st level of categories
     ///////////////////////////////////////////////////////////////////////
 
 //JASPERSOFT #1
@@ -402,9 +405,18 @@
             !(category = this.axis.categories[this.pos]))
             return;
 
-        // set label text
-        if (category.name && this.label)
-            this.label.attr('text', category.name);
+        // JASPERSOFT #4
+        // set label text - but applied after formatter #46
+        if (category.name && this.label) {
+            this.label.attr('text', this.axis.labelFormatter.call({
+                axis: this.axis,
+                chart: this.axis.chart,
+                isFirst: this.isFirst,
+                isLast: this.isLast,
+                value: category.name
+            }));
+        }
+        // END JASPERSOFT #4
 
         // create elements for parent categories
         if (this.axis.isGrouped)
