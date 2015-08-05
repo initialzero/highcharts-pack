@@ -56,6 +56,7 @@
 // #17 4/18/2015 fix JRS-5582 Click does not work for some charts
 //      fix applied from https://github.com/highslide-software/highcharts.com/commit/4df541623c2ecbd36658f299e10b7e879e506046
 //
+// #18 5/8/2015 fix JRS-6399 remove Highcharts from window
 ///////////////////////////////////////////////////////////////////////
 
 //JASPERSOFT #1
@@ -154,14 +155,14 @@
         setFullYear,
 
 
-    //JASPERSOFT #2
+    //JASPERSOFT #2 #18
     // lookup over the types and the associated classes
         seriesTypes = {},
-        Highcharts;
+        Highcharts = {};
 
     // The Highcharts namespace
-    Highcharts = win.Highcharts ? error(16, true) : {};
-    //END JASPERSOFT #2
+    //Highcharts = win.Highcharts ? error(16, true) : {};
+    //END JASPERSOFT #2 #18
 
     /**
      * Extend an object with the members of another
