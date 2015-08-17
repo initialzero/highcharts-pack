@@ -6,6 +6,15 @@
  * License: Creative Commons Attribution (CC)
  */
 
+	///////////////////////////////////////////////////////////////////////
+	//Jaspersoft Updates (look for comment: JASPERSOFT #x)
+	///////////////////////////////////////////////////////////////////////
+	// #1 7/8/14 amd-fication - Header; added dependency to jQuery.
+	//
+	// #2 7/8/14 amd-fication - Footer
+	///////////////////////////////////////////////////////////////////////
+
+//JASPERSOFT #1
 (function (factory, globalScope) {
 	"use strict";
 
@@ -17,6 +26,7 @@
 	}
 }(function(HC){
 	var HA = HC.__HighchartsAdapter__;
+//END JASPERSOFT #1
 /*jshint expr:true, boss:true */
 var UNDEFINED = void 0,
     mathRound = Math.round,
@@ -548,5 +558,7 @@ tickProto.getLabelSize = function () {
     return _tickGetLabelSize.call(this);
 };
 
+	//JASPERSOFT #2
 	return HC;
 }, this));
+//END JASPERSOFT #2

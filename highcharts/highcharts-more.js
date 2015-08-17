@@ -10,8 +10,25 @@
  */
 
 // JSLint options:
-/*global Highcharts, Highcharts.__HighchartsAdapter__, document, window, navigator, setInterval, clearInterval, clearTimeout, setTimeout, location, jQuery, $, console */
+/*global Highcharts, HighchartsAdapter, document, window, navigator, setInterval, clearInterval, clearTimeout, setTimeout, location, jQuery, $, console */
 
+///////////////////////////////////////////////////////////////////////
+//Jaspersoft Updates (look for comment: JASPERSOFT #x)
+///////////////////////////////////////////////////////////////////////
+// #1 4/9/14 amd-fication - Header
+//
+// #2 4/9/14 amd-fication - Footer
+//
+// #3 4/10/14 global namespace variable HighchartsAdapter is now taken
+// from Highcharts.__HighchartsAdapter__
+//
+// #4 8/18/14 fix legend font size, can understand em type
+//
+// #5 8/28/14 fix legend font size scaling
+//
+///////////////////////////////////////////////////////////////////////
+
+//JASPERSOFT #1
 (function (factory, globalScope) {
 	"use strict";
 
@@ -22,6 +39,7 @@
 		factory(globalScope.Highcharts);
 	}
 }(function (Highcharts, UNDEFINED) {
+	//END JASPERSOFT #1
 var arrayMin = Highcharts.arrayMin,
 	arrayMax = Highcharts.arrayMax,
 	each = Highcharts.each,
@@ -786,9 +804,11 @@ seriesTypes.arearange = extendClass(seriesTypes.area, {
 			higherPath;
 			
 		// Remove nulls from low segment
+		//JASPERSOFT #3
 		lowSegment = Highcharts.__HighchartsAdapter__.grep(segment, function (point) {
 			return point.plotLow !== null;
 		});
+		//END JASPERSOFT #3
 		
 		// Make a segment with plotX and plotY for the top values
 		while (i--) {
@@ -2034,11 +2054,15 @@ seriesTypes.bubble = extendClass(seriesTypes.scatter, {
 	 * @param {Object} item The series (this) or point
 	 */
 	drawLegendSymbol: function (legend, item) {
-		var radius = pInt(legend.itemStyle.fontSize) / 2;
+		//JASPERSOFT #4 #5
+		var radius = pInt(this.chart.renderer.fontMetrics(legend.itemStyle.fontSize, item.legendItem).f) / 2;
+		//END JASPERSOFT #4 #5
 		
 		item.legendSymbol = this.chart.renderer.circle(
 			radius,
-			legend.baseline - radius,
+			//JASPERSOFT #5
+			legend.baseline - radius + 1,
+			//END JASPERSOFT #5
 			radius
 		).attr({
 			zIndex: 3
@@ -2620,5 +2644,7 @@ Axis.prototype.beforePadding = function () {
 	});
 
 }());
+//JASPERSOFT #2
 	return Highcharts;
 }, this));
+//END JASPERSOFT #2
