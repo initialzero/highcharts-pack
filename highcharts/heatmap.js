@@ -914,7 +914,7 @@ var UNDEFINED,
 	}
 	//END JASPERSOFT #3
 
-	//JASPERSOFT #2
+//JASPERSOFT #2
 	return Highcharts;
 
 }, this));

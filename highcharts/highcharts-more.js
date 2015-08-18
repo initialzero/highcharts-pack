@@ -39,7 +39,7 @@
 		factory(globalScope.Highcharts);
 	}
 }(function (Highcharts, UNDEFINED) {
-	//END JASPERSOFT #1
+//END JASPERSOFT #1
 var arrayMin = Highcharts.arrayMin,
 	arrayMax = Highcharts.arrayMax,
 	each = Highcharts.each,

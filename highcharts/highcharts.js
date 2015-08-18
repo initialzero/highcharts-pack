@@ -12,6 +12,36 @@
 // JSLint options:
 /*global Highcharts, HighchartsAdapter, document, window, navigator, setInterval, clearInterval, clearTimeout, setTimeout, location, jQuery, $, console, each, grep */
 /*jslint ass: true, sloppy: true, forin: true, plusplus: true, nomen: true, vars: true, regexp: true, newcap: true, browser: true, continue: true, white: true */
+
+///////////////////////////////////////////////////////////////////////
+//Jaspersoft Updates (look for comment: JASPERSOFT #x)
+///////////////////////////////////////////////////////////////////////
+// #1 4/9/14, 4/10/14 amd-fication - Header; added dependency to jQuery.
+//
+// #2 4/9/14 amd-fication - Highcharts removed from
+// global namespace
+//
+// #3 4/9/14 amd-fication - Footer
+//
+// #4 4/10/2014 global variable HighchartsAdapter was put
+// into Highcharts.__HighchartsAdapter__ property
+//
+// #5 4/10/2014 former global variable HighchartsAdapter is now read
+// from Highcharts.__HighchartsAdapter__ property
+//
+// #6 4/25/2014 replaced "doc" variable by document related to container element
+// It fixes zoom if chart rendered in iframe
+//
+// #7 4/25/2014 use local jQuery variable, not from win.jQuery
+//
+// #8 7/21/2014 revert Highcharts bug 2466
+//
+// #9 7/29/2014 extend reset zoom button options for html rendering
+//
+// #10 8/28/2014 fix legend font scaling
+///////////////////////////////////////////////////////////////////////
+
+//JASPERSOFT #1
 (function (factory, globalScope) {
 	"use strict";
 
@@ -22,6 +52,7 @@
 		globalScope.Highcharts = factory(globalScope.jQuery);
 	}
 }(function (jQuery) {
+//END JASPERSOFT #1
 // encapsulated variables
 var UNDEFINED,
 	doc = document,
@@ -110,12 +141,14 @@ var UNDEFINED,
 	setFullYear,
 
 
+	//JASPERSOFT #2
 	// lookup over the types and the associated classes
 	seriesTypes = {},
-	Highcharts;
+	Highcharts = {};
 
-// The Highcharts namespace
-Highcharts = win.Highcharts = win.Highcharts ? error(16, true) : {};
+	// The Highcharts namespace
+	//Highcharts = win.Highcharts ? error(16, true) : {};
+	//END JASPERSOFT #2
 
 Highcharts.seriesTypes = seriesTypes;
 
@@ -873,7 +906,9 @@ pathAnim = {
 	/**
 	 * The default HighchartsAdapter for jQuery
 	 */
-	Highcharts.__HighchartsAdapter__ = Highcharts.__HighchartsAdapter__ || ($ && {
+	//JASPERSOFT #4
+	Highcharts.__HighchartsAdapter__ = win.HighchartsAdapter || ($ && {
+	//END JASPERSOFT #4
 		
 		/**
 		 * Initialize the adapter by applying some extensions to jQuery
@@ -1223,12 +1258,17 @@ pathAnim = {
 			}
 		}
 	});
-}(win.jQuery));
+//JASPERSOFT #7
+}(jQuery));
+//END JASPERSOFT #7
+
 
 
 // check for a custom HighchartsAdapter defined prior to this file
+//JASPERSOFT #5
 var globalAdapter = Highcharts.__HighchartsAdapter__,
 	adapter = globalAdapter || {};
+//END JASPERSOFT #5
 	
 // Initialize the adapter
 if (globalAdapter) {
@@ -3401,8 +3441,10 @@ SVGRenderer.prototype = {
 	 * @param {Object} hoverState
 	 * @param {Object} pressedState
 	 */
-	button: function (text, x, y, callback, normalState, hoverState, pressedState, disabledState, shape) {
-		var label = this.label(text, x, y, shape, null, null, null, null, 'button'),
+	//JASPERSOFT #9
+	button: function (text, x, y, callback, normalState, hoverState, pressedState, disabledState, shape, useHTML) {
+		var label = this.label(text, x, y, shape, null, null, useHTML, null, 'button'),
+	//END JASPERSOFT #9
 			curState = 0,
 			stateOptions,
 			stateStyle,
@@ -4104,7 +4146,9 @@ SVGRenderer.prototype = {
 
 		var renderer = this,
 			wrapper = renderer.g(className),
-			text = renderer.text('', 0, 0, useHTML)
+			//JASPERSOFT #9
+			text = wrapper.text = renderer.text('', 0, 0, useHTML)
+			//END JASPERSOFT #9
 				.attr({
 					zIndex: 1
 				}),
@@ -4355,6 +4399,9 @@ SVGRenderer.prototype = {
 				removeEvent(wrapper.element, 'mouseleave');
 
 				if (text) {
+					//JASPERSOFT #9
+					removeEvent(text, "click");
+					//END JASPERSOFT #9
 					text = text.destroy();
 				}
 				if (box) {
@@ -6848,7 +6895,9 @@ Axis.prototype = {
 		}
 
 		if (ret === UNDEFINED) {
-			if (mathAbs(value) >= 10000) { // add thousands separators
+			//JASPERSOFT #8
+			if (mathAbs(value) >= 1000) { // add thousands separators
+			//END JASPERSOFT #8
 				ret = Highcharts.numberFormat(value, -1);
 
 			} else { // small numbers
@@ -10897,7 +10946,12 @@ Legend.prototype = {
 			legend.scrollGroup = renderer.g()
 				.add(legend.contentGroup);
 		}
-		
+
+		//JASPERSOFT #10
+		legend.symbolWidth =  this.chart.renderer.fontMetrics(false, legendGroup).f;
+		options.symbolPadding = mathRound(legend.symbolWidth / 2.8);
+		//END JASPERSOFT #10
+
 		legend.renderTitle();
 
 		// add each series or point
@@ -11183,13 +11237,16 @@ var LegendSymbolMixin = Highcharts.LegendSymbolMixin = {
 	 * @param {Object} item The series (this) or point
 	 */
 	drawRectangle: function (legend, item) {
-		var symbolHeight = legend.options.symbolHeight || legend.fontMetrics.f;
+
+		//JASPERSOFT #10
+		var symbolSize = legend.options.symbolHeight || this.chart.renderer.fontMetrics(false, item.legendItem).f || 12;
 
 		item.legendSymbol = this.chart.renderer.rect(
 			0,
-			legend.baseline - symbolHeight + 1, // #3988
+			mathRound(legend.baseline -  (symbolSize / 1.1)),
 			legend.symbolWidth,
-			symbolHeight,
+			symbolSize,
+		//END JASPERSOFT #10
 			legend.options.symbolRadius || 0
 		).attr({
 			zIndex: 3
@@ -11873,7 +11930,12 @@ Chart.prototype = {
 		if (!renderTo) {
 			error(13, true);
 		}
-		
+
+		// replaced "doc" variable by document related to container element
+		//JASPERSOFT #6
+		doc = renderTo.ownerDocument;
+		//END JASPERSOFT #6
+
 		// If the container already holds a chart, destroy it. The check for hasRendered is there
 		// because web pages that are saved to disk from the browser, will preserve the data-highcharts-chart
 		// attribute and the SVG contents, but not an interactive chart. So in this case,
@@ -18042,15 +18104,34 @@ extend(Chart.prototype, {
 			theme = btnOptions.theme,
 			states = theme.states,
 			alignTo = btnOptions.relativeTo === 'chart' ? null : 'plotBox';
-			
-		this.resetZoomButton = chart.renderer.button(lang.resetZoom, null, null, function () { chart.zoomOut(); }, theme, states && states.hover)
-			.attr({
+
+		this.resetZoomButton = chart.renderer.button(
+			lang.resetZoom,
+			null,
+			null,
+			function () { chart.zoomOut(); },
+			theme,
+			states && states.hover,
+			//JASPERSOFT #9
+			UNDEFINED,
+			UNDEFINED,
+			UNDEFINED,
+			chart.options.chart.isHeatMapTimeSeriesChart // render HTML button
+			//END JASPERSOFT #9
+			).attr({
 				align: btnOptions.position.align,
 				title: lang.resetZoomTitle
 			})
 			.add()
 			.align(btnOptions.position, false, alignTo);
-			
+
+		//JASPERSOFT #9
+		if (chart.options.chart.isHeatMapTimeSeriesChart) {
+			this.resetZoomButton.text.on("click", function() {
+				chart.zoomOut();
+			});
+		}
+		//END JASPERSOFT #9
 	},
 
 	/**
@@ -18640,6 +18721,9 @@ extend(Highcharts, {
 	product: PRODUCT,
 	version: VERSION
 });
+
+//JASPERSOFT #3
 	return Highcharts;
 }, this));
+//END JASPERSOFT #3
 
