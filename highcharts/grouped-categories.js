@@ -12,6 +12,8 @@
 // #1 7/8/14 amd-fication - Header; added dependency to jQuery.
 //
 // #2 7/8/14 amd-fication - Footer
+//
+// #3 21/8/15 Adding code to control border line height around categories (JRS-6606)
 ///////////////////////////////////////////////////////////////////////
 
 //JASPERSOFT #1
@@ -210,7 +212,14 @@ axisProto.setupGroups = function (options) {
   this.tickLength       = options.tickLength || this.tickLength || null;
   this.directionFactor  = [-1, 1, 1, -1][this.side];
 
-  this.options.lineWidth = options.lineWidth || 1;
+  //JASPERSOFT #3
+  // Jaspersoft patch. Fixed situation when options.lineWidth === 0
+  if (typeof options.lineWidth === "undefined") {
+	  this.options.lineWidth = 1;
+  } else {
+	  this.options.lineWidth = options.lineWidth;
+  }
+  //END JASPERSOFT #3
 };
 
 
