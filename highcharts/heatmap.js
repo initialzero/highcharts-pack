@@ -18,6 +18,9 @@
 // #4 7/29/2014 extend styles for reset zoom button
 //
 // #5 10/6/2014 disable fix HC2893 for fix JRS-3449/BZ39422 (black heat map on resize in ff and chrome)
+//
+// #6 4/10/14 global namespace variable HighchartsAdapter is now taken
+// from Highcharts.__HighchartsAdapter__
 ///////////////////////////////////////////////////////////////////////
 
 //JASPERSOFT #1
@@ -504,7 +507,9 @@ extend(ColorAxis.prototype, {
  * Handle animation of the color attributes directly
  */
 each(['fill', 'stroke'], function (prop) {
+		//JASPERSOFT #6
 		Highcharts.__HighchartsAdapter__.addAnimSetter(prop, function (fx) {
+		//END JASPERSOFT #6
 		fx.elem.attr(prop, ColorAxis.prototype.tweenColors(Color(fx.start), Color(fx.end), fx.pos));
 	});
 });
