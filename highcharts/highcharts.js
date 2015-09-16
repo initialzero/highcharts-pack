@@ -39,6 +39,9 @@
 // #9 7/29/2014 extend reset zoom button options for html rendering
 //
 // #10 8/28/2014 fix legend font scaling
+//
+// #11 9/16/2015 disabling logic which prevents X labels to get overlapped (we allow this) (JRS-6619)
+//
 ///////////////////////////////////////////////////////////////////////
 
 //JASPERSOFT #1
@@ -8005,7 +8008,9 @@ Axis.prototype = {
 						if (score < bestScore) {
 							bestScore = score;
 							rotation = rot;
-							newTickInterval = step;
+							//JASPERSOFT #11
+							//newTickInterval = step;
+							//END JASPERSOFT #11
 						}
 					}
 				});
