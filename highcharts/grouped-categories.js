@@ -14,6 +14,8 @@
 // #2 7/8/14 amd-fication - Footer
 //
 // #3 21/8/15 Adding code to control border line height around categories (JRS-6606)
+//
+// #4 14/10/15 Removing rotation of x axis labels unless it's first-level label (JRS-6797)
 ///////////////////////////////////////////////////////////////////////
 
 //JASPERSOFT #1
@@ -409,7 +411,9 @@ tickProto.addGroupedLabels = function (category) {
       useHTML = options.useHTML,
       css     = options.style,
       userAttr= options.groupedOptions,
-      attr    = { align: 'center' , rotation: options.rotation },
+      // JASPERSOFT #4
+      attr    = { align: 'center' },
+      // END JASPERSOFT #4
       size    = axis.horiz ? 'height' : 'width',
       depth   = 0,
       label;
