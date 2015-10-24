@@ -46,6 +46,8 @@
 // #12 10/23/2015 JRS-7123: copied temporary fix from this issue: https://github.com/highslide-software/highcharts.com/issues/4374
 //                Check that issue if it's fixed to decide copy or not this patch next time.
 //
+// #13 25/10/2015 JRS-7150: getting back removed code to display tooltips for Time Series Heat Map
+//
 ///////////////////////////////////////////////////////////////////////
 
 //JASPERSOFT #1
@@ -12462,6 +12464,13 @@ Chart.prototype = {
 	renderSeries: function () {
 		each(this.series, function (serie) {
 			serie.translate();
+			//JASPERSOFT #13
+			if (serie.userOptions.chartType === "timeseries_heatmap") {
+				if (serie.setTooltipPoints) {
+					serie.setTooltipPoints();
+				}
+			}
+			//END JASPERSOFT #13
 			serie.render();
 		});
 	},
