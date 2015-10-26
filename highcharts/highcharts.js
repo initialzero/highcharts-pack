@@ -40,13 +40,10 @@
 //
 // #10 8/28/2014 fix legend font scaling
 //
-// #11 9/16/2015 JRS-6619: copied fix for HC library (https://github.com/highslide-software/highcharts.com/issues/3971).
-//               This fix is present in HC 4.1.9, so don't copy this patch next time.
-//
-// #12 10/23/2015 JRS-7123: copied temporary fix from this issue: https://github.com/highslide-software/highcharts.com/issues/4374
+// #11 10/23/2015 JRS-7123: copied temporary fix from this issue: https://github.com/highslide-software/highcharts.com/issues/4374
 //                Check that issue if it's fixed to decide copy or not this patch next time.
 //
-// #13 25/10/2015 JRS-7150: getting back removed code to display tooltips for Time Series Heat Map
+// #12 25/10/2015 JRS-7150: getting back removed code to display tooltips for Time Series Heat Map
 //
 ///////////////////////////////////////////////////////////////////////
 
@@ -7753,11 +7750,11 @@ Axis.prototype = {
 			isDirtyData,
 			isDirtyAxisLength;
 
-		//JASPERSOFT #12
+		//JASPERSOFT #11
 		if (this.options.alignTicks !== false || this.chart.options.alignTicks !== false) {
 			this.forceRedraw = true;
 		}
-		//END JASPERSOFT #12
+		//END JASPERSOFT #11
 
 		axis.oldMin = axis.min;
 		axis.oldMax = axis.max;
@@ -8000,13 +7997,9 @@ Axis.prototype = {
 			};
 		
 		if (horiz) {
-			//JASPERSOFT #11
-			autoRotation = !labelOptions.staggerLines && !labelOptions.step && ( // #3971
-					defined(rotationOption) ?
-						[rotationOption] :
-						slotSize < pick(labelOptions.autoRotationLimit, 80) && labelOptions.autoRotation
-				);
-			//END JASPERSOFT #11
+			autoRotation = defined(rotationOption) ?
+								[rotationOption] :
+							slotSize < pick(labelOptions.autoRotationLimit, 80) && !labelOptions.staggerLines && !labelOptions.step && labelOptions.autoRotation;
 
 			if (autoRotation) {
 
@@ -12464,13 +12457,13 @@ Chart.prototype = {
 	renderSeries: function () {
 		each(this.series, function (serie) {
 			serie.translate();
-			//JASPERSOFT #13
+			//JASPERSOFT #12
 			if (serie.userOptions.chartType === "timeseries_heatmap") {
 				if (serie.setTooltipPoints) {
 					serie.setTooltipPoints();
 				}
 			}
-			//END JASPERSOFT #13
+			//END JASPERSOFT #12
 			serie.render();
 		});
 	},
