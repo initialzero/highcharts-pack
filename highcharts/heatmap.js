@@ -33,8 +33,6 @@
 	}
 }(function (Highcharts) {
 
-	var $ = require("jquery");
-
 //END JASPERSOFT #1
 
 var UNDEFINED,
@@ -672,13 +670,13 @@ var UNDEFINED,
 			this.yAxis.axisPointRange = options.rowsize || 1; // general point range
 
 			//JASPERSOFT #3
-			var $container = $(this.chart.container),
+			var $container = jQuery(this.chart.container),
 				$style = $container.find("#jasper_highcharts_css");
 
 			if (this.chart.options.chart.isHeatMapTimeSeriesChart) {
 				if ($style.length === 0) {
 
-					var style = $("<style type='text/css'>" +
+					var style = jQuery("<style type='text/css'>" +
 						".highcharts-tooltip>span {" +
 							"background: rgba(255,255,255,0.85);" +
 							"border: 1px solid silver;" +
