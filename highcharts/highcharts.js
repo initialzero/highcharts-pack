@@ -45,6 +45,8 @@
 //
 // #12 25/10/2015 JRS-7150: getting back removed code to display tooltips for Time Series Heat Map
 //
+// #13 31/10/2015 JRS-6619: fixing interval between labels on X axes: making it constant for our reasons
+//
 ///////////////////////////////////////////////////////////////////////
 
 //JASPERSOFT #1
@@ -8022,6 +8024,10 @@ Axis.prototype = {
 					}
 				});
 			}
+
+			//JASPERSOFT #13
+			newTickInterval = 1;
+			//END JASPERSOFT #13
 
 		} else if (!labelOptions.step) { // #4411
 			newTickInterval = getStep(labelMetrics.h);
