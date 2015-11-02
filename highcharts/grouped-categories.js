@@ -16,6 +16,9 @@
 // #3 21/8/15 Adding code to control border line height around categories (JRS-6606)
 //
 // #4 14/10/15 Removing rotation of x axis labels unless it's first-level label (JRS-6797)
+//
+// #5 2015-11-02 Applying fix for bug 44155. Fixed by Highsoft in 
+// https://github.com/blacklabel/grouped_categories/commit/aa92da19a5baeb79ba985c7b407b0f564176318b
 ///////////////////////////////////////////////////////////////////////
 
 //JASPERSOFT #1
@@ -565,9 +568,18 @@ tickProto.destroy = function () {
 
 // return size of the label (height for horizontal, width for vertical axes)
 tickProto.getLabelSize = function () {
-  if (this.axis.isGrouped === true)
+  if (this.axis.isGrouped === true) {
+    // JASPERSOFT #5
+    // #72, getBBox might need recalculating when chart is tall
+    var size = _tickGetLabelSize.call(this) + 10,
+        topLabelSize = this.axis.labelsSizes[0];
+    if (topLabelSize < size) {
+        this.axis.labelsSizes[0] = size;
+    }
+    // END JASPERSOFT #4
+
     return sum(this.axis.labelsSizes);
-  else
+  } else
     return _tickGetLabelSize.call(this);
 };
 
