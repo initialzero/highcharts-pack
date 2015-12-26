@@ -27,6 +27,8 @@
 //
 // #7 25/10/2015 JRS-7150: getting back removed code to display tooltips for Time Series Heat Map
 //
+// #8 27/12/2015 JRS-6619: rendering all labels on axis no matter how many it's gonna be by blocking HC's protection
+//
 ///////////////////////////////////////////////////////////////////////
 
 //JASPERSOFT #1
@@ -7951,7 +7953,9 @@
 
                 // Too dense ticks, keep only the first and last (#4477)
                 if (tickPositions.length > this.len) {
-                    tickPositions = [tickPositions[0], tickPositions.pop()];
+                    //JASPERSOFT #8
+                    //tickPositions = [tickPositions[0], tickPositions.pop()];
+                    //END JASPERSOFT #8
                 }
 
                 this.tickPositions = tickPositions;
