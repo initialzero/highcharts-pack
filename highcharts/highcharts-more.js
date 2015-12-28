@@ -9,12 +9,32 @@
  * License: www.highcharts.com/license
  */
 
-(function (factory) {
+///////////////////////////////////////////////////////////////////////
+//Jaspersoft Updates (look for comment: JASPERSOFT #x)
+///////////////////////////////////////////////////////////////////////
+// #1 amd-fication
+//
+// #2 4/10/14 global namespace variable HighchartsAdapter is now taken
+// from Highcharts.__HighchartsAdapter__
+//
+// #3 8/18/14 fix legend font size, can understand em type
+//
+// #4 8/28/14 fix legend font size scaling
+//
+///////////////////////////////////////////////////////////////////////
+
+//JASPERSOFT #1
+(function (factory, globalScope) {
+    "use strict";
+
     if (typeof module === 'object' && module.exports) {
         module.exports = factory;
+    } else if (typeof define === "function" && define.amd) {
+        define(["highcharts"], factory);
     } else {
-        factory(Highcharts);
+        factory(globalScope.Highcharts);
     }
+//END JASPERSOFT #1
 }(function (Highcharts) {
 var arrayMin = Highcharts.arrayMin,
         arrayMax = Highcharts.arrayMax,
@@ -2092,11 +2112,15 @@ var arrayMin = Highcharts.arrayMin,
          */
         drawLegendSymbol: function (legend, item) {
             var renderer = this.chart.renderer,
-                radius = renderer.fontMetrics(legend.itemStyle.fontSize).f / 2;
+                //JASPERSOFT #2 #3
+                radius = pInt(renderer.fontMetrics(legend.itemStyle.fontSize, item.legendItem).f) / 2;
+                //END JASPERSOFT #2 #3
 
             item.legendSymbol = renderer.circle(
                 radius,
-                legend.baseline - radius,
+                //JASPERSOFT #3
+                legend.baseline - radius + 1,
+                //END JASPERSOFT #3
                 radius
             ).attr({
                 zIndex: 3
@@ -2683,5 +2707,7 @@ var arrayMin = Highcharts.arrayMin,
         });
 
     }());
-
-}));
+//JASPERSOFT #1
+    return Highcharts;
+}, this));
+//END JASPERSOFT #1

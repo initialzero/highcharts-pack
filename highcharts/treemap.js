@@ -1,5 +1,5 @@
 /**
- * @license @product.name@ JS v@product.version@ (@product.date@)
+ * @license Highcharts JS v4.2.1 (2015-12-21)
  *
  * (c) 2014 Highsoft AS
  * Authors: Jon Arild Nygard / Oystein Moseng
@@ -7,12 +7,28 @@
  * License: www.highcharts.com/license
  */
 
-(function (factory) {
-	if (typeof module === 'object' && module.exports) {
+///////////////////////////////////////////////////////////////////////
+//Jaspersoft Updates (look for comment: JASPERSOFT #x)
+///////////////////////////////////////////////////////////////////////
+//
+// #1 amd-fication
+//
+// #2 12/28/2015 JRS-7249: translating button Back
+//
+///////////////////////////////////////////////////////////////////////
+
+//JASPERSOFT #1
+(function (factory, globalScope) {
+    "use strict";
+
+    if (typeof module === 'object' && module.exports) {
 		module.exports = factory;
-	} else {
-		factory(Highcharts);
+	} else if (typeof define === "function" && define.amd) {
+        define(["highcharts"], factory);
+    } else {
+		factory(globalScope.Highcharts);
 	}
+//END JASPERSOFT #1
 }(function (H) {
 	var seriesTypes = H.seriesTypes,
 		map = H.map,
@@ -797,7 +813,9 @@
 		},
 		showDrillUpButton: function (name) {
 			var series = this,
-				backText = (name || '< Back'),
+				//JASPERSOFT #2
+				backText = (name || '< ' + H.getOptions().lang.drillUpButton),
+				//END JASPERSOFT #2
 				buttonOptions = series.options.drillUpButton,
 				attr,
 				states;
@@ -865,4 +883,7 @@
 			H.extend(this.xAxis.options, treeAxis);
 		}
 	}));
-}));
+//JASPERSOFT #1
+    return H;
+}, this));
+//END JASPERSOFT #1

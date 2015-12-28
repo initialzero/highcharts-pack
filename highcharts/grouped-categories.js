@@ -5,7 +5,31 @@
  *
  * License: Creative Commons Attribution (CC)
  */
-(function(HC){
+
+
+///////////////////////////////////////////////////////////////////////
+//Jaspersoft Updates (look for comment: JASPERSOFT #x)
+///////////////////////////////////////////////////////////////////////
+// #1 amd-fication
+//
+// #2 21/8/15 Adding code to control border line height around categories (JRS-6606)
+//
+// #3 14/10/15 Removing rotation of x axis labels unless it's first-level label (JRS-6797)
+///////////////////////////////////////////////////////////////////////
+
+//JASPERSOFT #1
+(function (factory, globalScope) {
+    "use strict";
+
+    if (typeof module === 'object' && module.exports) {
+        module.exports = factory;
+    } else if (typeof define === "function" && define.amd) {
+        define(["highcharts"], factory);
+    } else {
+        factory(globalScope.Highcharts);
+    }
+//END JASPERSOFT #1
+}(function(HC){
 /*jshint expr:true, boss:true */
 var UNDEFINED = void 0,
     mathRound = Math.round,
@@ -197,7 +221,13 @@ axisProto.setupGroups = function (options) {
   this.tickWidth        = pick(options.tickWidth, this.isXAxis ? 1 : 0);
   this.directionFactor  = [-1, 1, 1, -1][this.side];
 
-  this.options.lineWidth = pick(options.lineWidth, 1);
+  //JASPERSOFT #2
+  if (typeof options.lineWidth === "undefined") {
+    this.options.lineWidth = 1;
+  } else {
+    this.options.lineWidth = pick(options.lineWidth, 1);
+  }
+  //END JASPERSOFT #2
 };
 
 
@@ -399,7 +429,9 @@ tickProto.addGroupedLabels = function (category) {
       useHTML = options.useHTML,
       css     = options.style,
       userAttr= options.groupedOptions,
-      attr    = { align: 'center' , rotation: options.rotation, x: 0, y: 0 },
+      // JASPERSOFT #3
+      attr    = { align: 'center' , x: 0, y: 0 },
+      // END JASPERSOFT #3
       size    = axis.horiz ? 'height' : 'width',
       depth   = 0,
       label;
@@ -577,4 +609,7 @@ tickProto.getLabelSize = function () {
     return _tickGetLabelSize.call(this);
 };
 
-}(Highcharts));
+//JASPERSOFT #1
+  return HC;
+}, this));
+//END JASPERSOFT #1

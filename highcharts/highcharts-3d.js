@@ -9,12 +9,26 @@
  * @license: www.highcharts.com/license
  */
 
-(function (factory) {
+///////////////////////////////////////////////////////////////////////
+//Jaspersoft Updates (look for comment: JASPERSOFT #x)
+///////////////////////////////////////////////////////////////////////
+//
+// #1 amd-fication
+//
+///////////////////////////////////////////////////////////////////////
+
+//JASPERSOFT #1
+(function (factory, globalScope) {
+    "use strict";
+
     if (typeof module === 'object' && module.exports) {
         module.exports = factory;
+    } else if (typeof define === "function" && define.amd) {
+        define(["highcharts"], factory);
     } else {
-        factory(Highcharts);
+        factory(globalScope.Highcharts);
     }
+//END JASPERSOFT #1
 }(function (Highcharts) {
 /**
         Shorthands for often used function
@@ -1709,4 +1723,7 @@
 
     }
 
-}));
+//JASPERSOFT #1
+    return Highcharts;
+}, this));
+//END JASPERSOFT #1

@@ -1,5 +1,5 @@
 /**
- * @license  @product.name@ JS v@product.version@ (@product.date@)
+ * @license Highcharts JS v4.2.1 (2015-12-21)
  * Solid angular gauge module
  *
  * (c) 2010-2014 Torstein Honsi
@@ -7,12 +7,26 @@
  * License: www.highcharts.com/license
  */
 
-(function (factory) {
-	if (typeof module === 'object' && module.exports) {
+///////////////////////////////////////////////////////////////////////
+//Jaspersoft Updates (look for comment: JASPERSOFT #x)
+///////////////////////////////////////////////////////////////////////
+//
+// #1 amd-fication
+//
+///////////////////////////////////////////////////////////////////////
+
+//JASPERSOFT #1
+(function (factory, globalScope) {
+    "use strict";
+
+    if (typeof module === 'object' && module.exports) {
 		module.exports = factory;
-	} else {
-		factory(Highcharts);
+    } else if (typeof define === "function" && define.amd) {
+        define(["highcharts"], factory);
+    } else {
+		factory(globalScope.Highcharts);
 	}
+//END JASPERSOFT #1
 }(function (H) {
 	'use strict';
 
@@ -269,5 +283,7 @@
 			}
 		}
 	});
-
-}));
+//JASPERSOFT #1
+    return H;
+}, this));
+//END JASPERSOFT #1

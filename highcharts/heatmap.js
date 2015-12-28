@@ -5,13 +5,36 @@
  *
  * License: www.highcharts.com/license
  */
+
+///////////////////////////////////////////////////////////////////////
+//Jaspersoft Updates (look for comment: JASPERSOFT #x)
+///////////////////////////////////////////////////////////////////////
+// #1 amd-fication
+//
+// #2 7/16/14, 7/17/14 extend heatmap for canvas rendering, extend tooltip for time series heatmap
+//
+// #3 7/29/2014 extend styles for reset zoom button
+//
+// #4 28/12/2015 JRS-6741: adding fix from HC team which was reverted for some reason (haven't provided).
+//               here is the ticket on HC: https://github.com/highcharts/highcharts/issues/4816
+//               and here is the commit: https://github.com/highcharts/highcharts/commit/ee8d5678df158567a4861ef412a99b796ea4ab0a
+//               So, during next upgrade, please, check if this commit was taken back again
+//
+///////////////////////////////////////////////////////////////////////
+
 /* eslint indent: [2, 4] */
-(function (factory) {
+//JASPERSOFT #1
+(function (factory, globalScope) {
+    "use strict";
+
     if (typeof module === 'object' && module.exports) {
         module.exports = factory;
+    } else if (typeof define === "function" && define.amd) {
+        define(["highcharts"], factory);
     } else {
-        factory(Highcharts);
+        factory(globalScope.Highcharts);
     }
+//END JASPERSOFT #1
 }(function (Highcharts) {
 
 
@@ -51,7 +74,9 @@
             minPadding: 0,
             maxPadding: 0,
             gridLineWidth: 1,
-            tickPixelInterval: 72,
+            //JASPERSOFT #4
+            //tickPixelInterval: 72,
+            //END JASPERSOFT #4
             startOnTick: true,
             endOnTick: true,
             offset: 0,
@@ -64,6 +89,9 @@
             },
             labels: {
                 overflow: 'justify'
+                //JASPERSOFT #4
+                ,rotation: 0
+                //END JASPERSOFT #4
             },
             minColor: '#EFEFFF',
             maxColor: '#003875',
@@ -76,6 +104,9 @@
             // Build the options
             options = merge(this.defaultColorAxisOptions, {
                 side: horiz ? 2 : 1,
+                //JASPERSOFT #4
+                tickPixelInterval: horiz ? 100 : 72,
+                //END JASPERSOFT #4
                 reversed: !horiz
             }, userOptions, {
                 opposite: !horiz,
@@ -648,6 +679,51 @@
             options = this.options;
             options.pointRange = pick(options.pointRange, options.colsize || 1); // #3758, prevent resetting in setData
             this.yAxis.axisPointRange = options.rowsize || 1; // general point range
+
+            //JASPERSOFT #2
+            var $container = jQuery(this.chart.container),
+                $style = $container.find("#jasper_highcharts_css");
+
+            if (this.chart.options.chart.isHeatMapTimeSeriesChart) {
+                if ($style.length === 0) {
+
+                    var style = jQuery("<style type='text/css'>" +
+                        ".highcharts-tooltip>span {" +
+                        "background: rgba(255,255,255,0.85);" +
+                        "border: 1px solid silver;" +
+                        "border-radius: 3px;" +
+                        "box-shadow: 1px 1px 2px #888;" +
+                        "padding: 8px;" +
+                        "z-index: 2;" +
+                        "}" +
+                        // JASPERSOFT #3
+                        // reset zoom button patch
+                        ".highcharts-button>span {" +
+                        "background: rgba(255,255,255,0.85);" +
+                        "border: 1px solid silver;" +
+                        "border-radius: 3px;" +
+                        "padding: 5px;" +
+                        "z-index: 2;" +
+                        "cursor: pointer;" +
+                        "}" +
+                        ".highcharts-button>span:hover {" +
+                        "background: -moz-linear-gradient(top, #ffffff 0%, #aaccff 100%);" +
+                        "background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(100%,#aaccff));" +
+                        "background: -webkit-linear-gradient(top, #ffffff 0%,#aaccff 100%);" +
+                        "background: -o-linear-gradient(top, #ffffff 0%,#aaccff 100%);" +
+                        "background: -ms-linear-gradient(top, #ffffff 0%,#aaccff 100%);" +
+                        "background: linear-gradient(to bottom, #ffffff 0%,#aaccff 100%);" +
+                        "filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#aaccff',GradientType=0 );" +
+                            //END JASPERSOFT #3
+                        "}</style>");
+
+                    style.attr("id", "jasper_highcharts_css");
+                    $container.append(style);
+                }
+            } else {
+                $style.length && $style.remove();
+            }
+            //END JASPERSOFT #2
         },
         translate: function () {
             var series = this,
@@ -690,7 +766,41 @@
                 });
             }
         },
-        drawPoints: seriesTypes.column.prototype.drawPoints,
+        //JASPERSOFT #2
+        drawPoints: function() {
+            var ctx;
+            if (this.chart.renderer.forExport || !this.chart.options.chart.isHeatMapTimeSeriesChart) {
+                // Run SVG shapes
+                seriesTypes.column.prototype.drawPoints.call(this);
+            } else {
+
+                if (ctx = this.getContext()) {
+                    ctx.canvas.height = this.chart.renderer.plotBox.height;
+                    ctx.canvas.width = this.chart.renderer.plotBox.width;
+
+                    // draw the columns
+                    Highcharts.each(this.points, function (point) {
+                        var plotY = point.plotY,
+                            shapeArgs;
+
+                        if (plotY !== undefined && !isNaN(plotY) && point.y !== null) {
+                            shapeArgs = point.shapeArgs;
+
+                            ctx.fillStyle = point.pointAttr[''].fill;
+                            ctx.fillRect(shapeArgs.x, shapeArgs.y, shapeArgs.width, shapeArgs.height);
+                        }
+                    });
+
+                } else {
+                    this.chart.showLoading("Your browser doesn't support HTML5 canvas, <br>please use a modern browser");
+
+                    // Uncomment this to provide low-level (slow) support in oldIE. It will cause script errors on
+                    // charts with more than a few thousand points.
+                    //proceed.call(this);
+                }
+            }
+        },
+        //END JASPERSOFT #2
         animate: noop,
         getBox: noop,
         drawLegendSymbol: LegendSymbolMixin.drawRectangle,
@@ -704,8 +814,135 @@
             // Get the extremes from the y data
             Series.prototype.getExtremes.call(this);
         }
+        //JASPERSOFT #2
+        , getContext: function () {
+            var canvas;
 
+            if (!this.ctx) {
+                canvas = document.createElement('canvas'); // TODO use doc context because of iframes ???
+                canvas.setAttribute('width', this.chart.plotWidth);
+                canvas.setAttribute('height', this.chart.plotHeight);
+                canvas.style.position = 'absolute';
+                canvas.style.left = this.group.translateX + 'px';
+                canvas.style.top = this.group.translateY + 'px';
+                canvas.style.zIndex = 0;
+                canvas.style.cursor = 'crosshair';
+
+                this.chart.container.appendChild(canvas);
+                if (canvas.getContext) {
+                    this.ctx = canvas.getContext('2d');
+                }
+            }
+            return this.ctx;
+        },
+        setTooltipPoints: function() {
+            var series = this;
+
+            this.tree = null;
+            setTimeout(function() {
+                series.tree = KDTree(series.points, 0);
+            });
+        },
+        getNearest: function(search) {
+            if (this.tree) {
+                return nearest(search, this.tree, 0);
+            }
+        }
+        //END JASPERSOFT #2
     }));
 
+    //JASPERSOFT #2
+    Highcharts.wrap(Highcharts.Pointer.prototype, 'runPointActions', function (proceed, e) {
+        var chart = this.chart;
+        proceed.call(this, e);
 
-}));
+        if (!this.chart.options.chart.isHeatMapTimeSeriesChart) {
+            return;
+        }
+
+        // Draw independent tooltips
+        Highcharts.each(chart.series, function (series) {
+            var point;
+            if (series.getNearest) {
+                point = series.getNearest({
+                    plotX: e.chartX - chart.plotLeft,
+                    plotY: e.chartY - chart.plotTop
+                });
+                if (point) {
+                    point.onMouseOver(e);
+                }
+            }
+        });
+    });
+
+    /**
+     * Recursively builds a K-D-tree
+     */
+    function KDTree(points, depth) {
+        var axis, median, length = points && points.length;
+
+        if (length) {
+
+            // alternate between the axis
+            axis = ['plotX', 'plotY'][depth % 2];
+
+            // sort point array
+            points.sort(function(a, b) {
+                return a[axis] - b[axis];
+            });
+
+            median = Math.floor(length / 2);
+
+            // build and return node
+            return {
+                point: points[median],
+                left: KDTree(points.slice(0, median), depth + 1),
+                right: KDTree(points.slice(median + 1), depth + 1)
+            };
+        }
+    }
+
+    /**
+     * Recursively searches for the nearest neighbour using the given K-D-tree
+     */
+    function nearest(search, tree, depth) {
+        var point = tree.point,
+            axis = ['plotX', 'plotY'][depth % 2],
+            tdist,
+            sideA,
+            sideB,
+            ret = point,
+            nPoint1,
+            nPoint2;
+
+        // Get distance
+        point.dist = Math.pow(search.plotX - point.plotX, 2) +
+            Math.pow(search.plotY - point.plotY, 2);
+
+        // Pick side based on distance to splitting point
+        tdist = search[axis] - point[axis];
+        sideA = tdist < 0 ? 'left' : 'right';
+
+        // End of tree
+        if (tree[sideA]) {
+            nPoint1 = nearest(search, tree[sideA], depth + 1);
+
+            ret = (nPoint1.dist < ret.dist ? nPoint1 : point);
+
+            sideB = tdist < 0 ? 'right' : 'left';
+            if (tree[sideB]) {
+                // compare distance to current best to splitting point to decide wether to check side B or not
+                if (Math.abs(tdist) < ret.dist) {
+                    nPoint2 = nearest(search, tree[sideB], depth + 1);
+                    ret = (nPoint2.dist < ret.dist ? nPoint2 : ret);
+                }
+            }
+        }
+        return ret;
+    }
+    //END JASPERSOFT #2
+
+//JASPERSOFT #1
+    return Highcharts;
+}, this));
+//END JASPERSOFT #1
