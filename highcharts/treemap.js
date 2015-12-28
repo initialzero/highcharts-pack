@@ -13,6 +13,8 @@
 //
 // #1 amd-fication
 //
+// #2 12/28/2015 JRS-7249: translating button Back
+//
 ///////////////////////////////////////////////////////////////////////
 
 //JASPERSOFT #1
@@ -811,7 +813,9 @@
 		},
 		showDrillUpButton: function (name) {
 			var series = this,
-				backText = (name || '< Back'),
+				//JASPERSOFT #2
+				backText = (name || '< ' + H.getOptions().lang.drillUpButton),
+				//END JASPERSOFT #2
 				buttonOptions = series.options.drillUpButton,
 				attr,
 				states;
