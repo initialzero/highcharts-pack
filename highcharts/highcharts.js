@@ -34,6 +34,10 @@
 //               and here is the commit: https://github.com/highcharts/highcharts/commit/ee8d5678df158567a4861ef412a99b796ea4ab0a
 //               So, during next upgrade, please, check if this commit was taken back again
 //
+// #10 19/01/2016  Bug 41037: adding code to support HTML scaling factor. The code was copied from
+//                 issue https://github.com/highcharts/highcharts/issues/2405.
+//                 If you find that this issue is fixed you should remove this patch and test JRS agains bug 41037
+//
 ///////////////////////////////////////////////////////////////////////
 
 //JASPERSOFT #1
@@ -10007,10 +10011,33 @@
                 chartY = ePos.pageY - chartPosition.top;
             }
 
-            return extend(e, {
+            //JASPERSOFT #10
+            e = extend(e, {
                 chartX: mathRound(chartX),
                 chartY: mathRound(chartY)
             });
+
+            var element = this.chart.container;
+            if (element && element.offsetWidth && element.offsetHeight) {
+
+                var elementSize = element.getBoundingClientRect();
+
+                if (elementSize.width && elementSize.height) { // these are not supported by IE less than 9
+
+                    var scaleX = elementSize.width / element.offsetWidth;
+                    var scaleY = elementSize.height / element.offsetHeight;
+
+                    if (scaleX !== 1) {
+                        e.chartX = parseInt(e.chartX / scaleX, 10);
+                    }
+                    if (scaleY !== 1) {
+                        e.chartY = parseInt(e.chartY / scaleY, 10);
+                    }
+                }
+            }
+
+            return e;
+            //END JASPERSOFT #10
         },
 
         /**
