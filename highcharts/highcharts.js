@@ -38,6 +38,10 @@
 //                 issue https://github.com/highcharts/highcharts/issues/2405.
 //                 If you find that this issue is fixed you should remove this patch and test JRS agains bug 41037
 //
+// #11 07/12/2016 JRL-1183: ticks display outside the axis after zoom
+//                applied patch for HC issue https://github.com/highcharts/highcharts/issues/4086
+//                original fix at https://github.com/highcharts/highcharts/commit/6517e1039635db3190ebd334c818af3bb7c0a45d
+//                the fix is included in HC 4.2.2
 ///////////////////////////////////////////////////////////////////////
 
 //JASPERSOFT #1
@@ -8011,14 +8015,22 @@
 
             if (startOnTick) {
                 this.min = roundedMin;
-            } else if (this.min - minPointOffset > roundedMin) {
-                tickPositions.shift();
+            //JASPERSOFT #11
+            } else {
+                while (this.min - minPointOffset > tickPositions[0]) {
+                    tickPositions.shift();
+                }
+            //END JASPERSOFT #11
             }
 
             if (endOnTick) {
                 this.max = roundedMax;
-            } else if (this.max + minPointOffset < roundedMax) {
-                tickPositions.pop();
+            //JASPERSOFT #11
+            } else {
+                while (this.max + minPointOffset < tickPositions[tickPositions.length - 1]) {
+                    tickPositions.pop();
+                }
+            //END JASPERSOFT #11
             }
 
             // If no tick are left, set one tick in the middle (#3195)
